@@ -21,7 +21,7 @@ class MovingAverageCrossStrategy:
         s = pd.Series(self.prices)
         short_ma = s.tail(self.short_window).mean()
         long_ma = s.tail(self.long_window).mean()  
-
+        print(f"    [DEBUG] {market_event.dt} short_ma={short_ma:.2f} long_ma={long_ma:.2f} in_position={self.in_position}")
         if short_ma > long_ma and not self.in_position:
             self.in_position = True
             return SignalEvent(

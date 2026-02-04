@@ -38,11 +38,11 @@ class Portfolio:
             "dt" : fill_event.dt,
             "direction" : fill_event.direction,
             "quantity" : fill_event.quantity,
-            "price" : fill_event.price,
+            "price" : fill_event.fill_price,
             "commission" : fill_event.commission,
             "slippage" : fill_event.slippage,
         })
-        
+
     def mark_to_market(self, dt, price : float):
         holdings = self.position.quantity * price
         equity = self.cash + holdings

@@ -34,16 +34,25 @@ class Backtester :
                 print(f" [SIGNAL] {event.symbol} -> {event.signal}")
 
                 if event.signal == "LONG":
-                    order = OrderEvent(
-                        type = EventType.ORDER,
-                        symbol=event.symbol,
-                        dt = event.dt,
-                        order_type="MKT",
-                        direction="BUY",
-                        quantity=self.quantity,
-                    )
-                    self.events.append(order)
-                
+                    fraction = 0.10
+                    price = self.last_market.close
+                    cash = self.portfolio.cash
+
+                    target_cash = cash * fraction
+                    qty = int(target_cash // price)
+
+                    if qty > 0:       
+                        order = OrderEvent(
+                            type = EventType.ORDER,
+                            symbol=event.symbol,
+                            dt = event.dt,
+                            order_type="MKT",
+                            direction="BUY",
+                            quantity=self.quantity,
+                        )
+                        self.events.append(order)
+                    else:
+                        print(" [SKIP] Not enough cash to buy atleast 1 share")
                 
                 elif event.signal == "EXIT":
                     qty = self.portfolio.position.quantity

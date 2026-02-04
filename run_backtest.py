@@ -6,7 +6,7 @@ from src.portfolio import Portfolio
 
 
 def main():
-    csv_path = "data/sample.csv"
+    csv_path = "data/sample_exit.csv"
     symbol = "TEST"
     
     data = CSVDataHandler(csv_path, symbol)
