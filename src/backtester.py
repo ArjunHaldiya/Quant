@@ -37,9 +37,10 @@ class Backtester :
                     fraction = 0.10
                     price = self.last_market.close
                     cash = self.portfolio.cash
+                    target = cash * fraction
+                    qty = int(target // price)
 
-                    target_cash = cash * fraction
-                    qty = int(target_cash // price)
+                    print(f"    [SIZING] cash = {cash: .2f} price = {price: .2f} target={target: .2f} -> qty ={qty}")
 
                     if qty > 0:       
                         order = OrderEvent(
@@ -48,7 +49,7 @@ class Backtester :
                             dt = event.dt,
                             order_type="MKT",
                             direction="BUY",
-                            quantity=self.quantity,
+                            quantity=qty,
                         )
                         self.events.append(order)
                     else:

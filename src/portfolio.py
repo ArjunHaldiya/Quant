@@ -12,6 +12,8 @@ class Portfolio:
         self.position = Position()
         self.equity_curve = []
         self.trades = []
+        self.last_price = 0.0
+        self.last_dt = None
 
 
         
@@ -46,6 +48,8 @@ class Portfolio:
     def mark_to_market(self, dt, price : float):
         holdings = self.position.quantity * price
         equity = self.cash + holdings
+        self.last_price = price
+        self.last_dt = dt
         self.equity_curve.append(
             {"dt" : dt, 
             "equity" : equity,
@@ -61,5 +65,6 @@ class Portfolio:
             "cash" : self.cash,
             "quantity" : self.position.quantity,
             "avg_price" : self.position.avg_price,
-            "equity" : self.cash + self.position.quantity * self.position.avg_price, 
+            "last_price" : self.last_price,
+            "equity" : self.cash + self.position.quantity * self.last_price, 
         }

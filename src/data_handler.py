@@ -1,5 +1,7 @@
 import pandas as pd
 from src.events import MarketEvent, EventType
+import yfinance  as yf
+from collections import deque
 
 class CSVDataHandler: 
     """
@@ -7,35 +9,30 @@ class CSVDataHandler:
     Expects CSV Columns: datetime,open,high,low,close,volume
     """
 
-    def __init__(self, csv_path: str, symbol: str):
+    def __init__(self, symbol: str, start = None, end = None, interval = "1d"):
         self.symbol = symbol
-        df = pd.read_csv(csv_path)
-        if "datetime" not in df.columns:
-            raise ValueError("CSV must contain a 'datatime' column")
-        df["datetime"] = pd.to_datetime(df["datetime"])
-        df = df.sort_values("datetime").reset_index(drop=True)
-
-        for c in ["open", "high", "low", "close", "volume"]:
-            if c not in df.columns:
-                df[c] = 0.0
-        self.df = df
-        self._i = 0
-        self.length = len(df)
-
+        self.interval = interval
+        self.raw = yf.download(ticket = symbol, start = start , end = end, interval=interval, progress = False)
+        self.df = self.raw.reset_index()
+        self.idx = 0
+        self.df = self.df.dropna().reset_index(drop = True)
+        
     def has_next(self) -> bool :
-        return self._i < self.length
+        return self.idx < len(self.df)
     
     def stream_next(self) -> MarketEvent:
         """Return next MarketEvent and advance pointer"""
-        row = self.df.iloc[self._i]
-        self._i +=1
-        return MarketEvent(
+        row = self.df.iloc[self.idx]
+        dt = row['Date'] if 'Date' in row.index else row.Name 
+        me =  MarketEvent(
             type = EventType.MARKET,
             symbol=self.symbol,
-            dt = row["datetime"],
-            open = float(row["open"]),
-            high = float(row["high"]),
-            low = float(row["low"]),
-            close = float(row["close"]),
-            volume = float(row.get("volume", 0.0)),
+            dt = pd.to_datetime(dt),
+            open = float(row["Open"]),
+            high = float(row["High"]),
+            low = float(row["Low"]),
+            close = float(row["Close"]),
+            volume = int(row["Volume"]),
         )
+        self.idx += 1
+        return me

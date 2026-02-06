@@ -10,7 +10,7 @@ def main():
     symbol = "TEST"
     
     data = CSVDataHandler(csv_path, symbol)
-    strat = MovingAverageCrossStrategy(symbol, short_window=2, long_window=4)
+    strat = MovingAverageCrossStrategy(symbol, short_window=2, long_window=3)
     exec_handler = SimulatedExecutionHandler(slippage_bps=2.0, commission=1.0)
     port = Portfolio(symbol, initial_cash=100_000)
 
